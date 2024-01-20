@@ -1,0 +1,60 @@
+﻿@page "/counter/{cantidad?}"
+@inject ILogger<Counter> loggerCounter
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+<p>Esto es una prueba</p>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<SurveyPrompt Title="Esta es la pagina de contador" />
+
+@code {
+
+    private int currentCount = 0;
+
+    [Parameter]
+    public string? cantidad { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? cantidadQuery { get; set; }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<string>("cantidadQuery",out var value))
+        {
+            if (value != null)
+            {
+                currentCount = int.Parse(value);
+            }
+        }
+
+        loggerCounter.LogInformation("SetParametersAsync");
+        return base.SetParametersAsync(parameters);
+    }
+
+    protected override void OnParametersSet()
+    {
+        loggerCounter.LogInformation("OnParametersSet");
+    }
+
+    protected override void OnInitialized()
+    {
+        //currentCount = cantidad != null ? int.Parse(cantidad) : 0;
+        loggerCounter.LogInformation("OnInitialized");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        loggerCounter.LogInformation("OnAfterRender");
+    }
+}

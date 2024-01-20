@@ -1,0 +1,56 @@
+﻿@page "/posts"
+@inject IPostsService postsService
+@inject NavigationManager navigationManager
+@inject IJSRuntime jsRuntime
+@inject IToastService toastService
+
+<h3>Posts</h3>
+
+<button class="btn btn-primary" @onclick="@(() => navigationManager.NavigateTo("/addpost"))">Add Post</button>
+
+@if (posts?.Count > 0)
+{
+    <div class="posts-container container text-center">
+        @foreach (var post in posts)
+        {
+            <div class="row">
+                <div class="col">
+                    <h4>@post.Title</h4>
+                    <p>@post.Body</p>
+                    <button title="Delete" class="btn btn-danger" @onclick="@(() => DeletePost(post))"><span class="oi oi-trash"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No hay posts</p>        
+}
+
+@code {
+
+    private List<Post>? posts;
+
+    private async Task GetPosts()
+    {
+        posts = await postsService.Get();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await GetPosts();
+    }
+
+    private async Task DeletePost(Post post)
+    {
+        /*if(!await jsRuntime.InvokeAsync<bool>("confirm",$"Estas seguro de eliminar el post: \n {post.Title}"))
+        {
+            return;
+        }*/
+        await postsService.Delete(post.Id);
+
+        toastService.ShowSuccess("Post eliminado");
+
+        await GetPosts();
+    }
+}

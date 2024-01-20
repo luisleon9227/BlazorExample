@@ -1,0 +1,34 @@
+﻿@page "/addpost"
+@inject IPostsService postsService
+@inject NavigationManager navigationManager
+
+<h3>AddPost</h3>
+
+<button class="btn btn-secondary" @onclick="@(() => navigationManager.NavigateTo("/posts"))">Ir lista de Post</button>
+
+<EditForm Model="@post" OnSubmit="@Save">
+    <div class="row">
+        <div class="col-8 form-group">
+            <label for="title" class="col-form-label">Title</label>
+            <InputText id="title" class="form-control" required @bind-Value="@post.Title" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-8 form-group">
+            <label for="body" class="col-form-label">Body</label>
+            <InputText id="body" class="form-control" required @bind-Value="@post.Body" />
+        </div>
+    </div>
+    <hr />
+    <button class="btn btn-primary" type="submit">Save</button>
+</EditForm>
+
+@code {
+    private Post post = new();
+
+    private async Task Save()
+    {
+        await postsService.Add(post);
+        navigationManager.NavigateTo("/posts");
+    }
+}
